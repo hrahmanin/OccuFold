@@ -9,11 +9,11 @@ This GitHub repository provides tools for training machine learning models to pr
 
 ### Structure of the repository
 The structure of this repository follows as below:
-- processing/ Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
-- models/ – Code for deep learning models (CNN architectures, training scripts, evaluation functions) used to predict CTCF occupancy or 3D contacts
-- analysis/ – Notebooks or scripts for analyzing results (e.g. comparing predicted vs. actual Hi-C, generating figures).
-- utils/ – Utility functions and tools (shared helper code for data I/O, metric calculations, etc.).
-- outputs/ – Folder to store output files, such as processed data or model predictions (keeping them separate from code)
+- processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
+- models/: Code for deep learning models (CNN architectures, training scripts, evaluation functions) used to predict CTCF occupancy or 3D contacts
+- analysis/: Notebooks or scripts for analyzing results (e.g. comparing predicted vs. actual Hi-C, generating figures).
+- utils/: Utility functions and tools (shared helper code for data I/O, metric calculations, etc.).
+- outputs/: Folder to store output files, such as processed data or model predictions (keeping them separate from code)
 
   
 
