@@ -10,6 +10,47 @@ This GitHub repository provides tools for training machine learning models to pr
 ### Structure of the repository
 The structure of this repository follows as below:
 - processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
+  # 🧬 CTCF Binding Site Processing Pipeline
+
+This notebook processes CTCF binding data from single-molecule footprinting (SMF) and ChIP-seq into one-hot encoded DNA sequences for use in machine learning models.
+
+## 🔄 Pipeline Overview
+
+1. **Load Data**  
+   Load CTCF binding site coordinates and binding frequency table.
+
+2. **Filter Sites**  
+   Keep only sites with all three biological states:  
+   _Accessible, Bound, Nucleosome-occupied_.
+
+3. **Pivot Frequencies**  
+   Reshape the table to have one row per site with frequency values for each state.
+
+4. **Merge with Coordinates**  
+   Combine genomic coordinates and binding frequency data into a single DataFrame.
+
+5. **Extract Sequences**  
+   Use `pyfaidx` to extract sequences from the mm10 reference genome.
+
+6. **One-Hot Encode**  
+   Convert sequences into 4×N matrices (A/C/G/T channels) for CNN input.
+
+7. **Visualize**  
+   Plot one-hot encoded sequences as grayscale "pixel" images for inspection.
+
+8. **Save Outputs**  
+   Write final annotated data to `sites_with_freqs_and_seqs.tsv`.
+
+---
+
+## 📁 Output
+
+- `sites_with_freqs_and_seqs.tsv` – Final annotated file including:
+  - `chrom`, `start`, `end`, `TFBS_cluster`
+  - Frequency columns: `Bound`, `Accessible`, `Nucleosome.occupied`
+  - DNA `sequence`
+
+
 - models/: Code for deep learning models (CNN architectures, training scripts, evaluation functions) used to predict CTCF occupancy or 3D contacts
 - analysis/: Notebooks or scripts for analyzing results (e.g. comparing predicted vs. actual Hi-C, generating figures).
 - utils/: Utility functions and tools (shared helper code for data I/O, metric calculations, etc.).
