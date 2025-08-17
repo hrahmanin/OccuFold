@@ -110,8 +110,8 @@ def fetch_and_orient_from_fasta(bedfile, ref_genome_filepath='/project/fudenber_
 
     return seqs, seq_len
 
-def predict_ctcf_occupancy(ctcf_bed, model_weights_path='data/model_weights'):
-    seqs, seq_len = fetch_and_orient_from_fasta(ctcf_bed)
+def predict_ctcf_occupancy(ctcf_bed, ctcfpfm = 'data/MA0139.1.pfm',model_weights_path='data/model_weights'):
+    seqs, seq_len = fetch_and_orient_from_fasta(ctcf_bed,ctcfpfm=ctcfpfm )
     seqs = torch.tensor(seqs, dtype=torch.float32).to(device)
     peaks_table = pd.read_table(ctcf_bed, sep=',')
 
