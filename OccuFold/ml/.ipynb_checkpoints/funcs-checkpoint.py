@@ -77,12 +77,12 @@ def scan_sequence(pwm, pwm_rc, seq):
         return "-", rc_motif_position
 
 def fetch_and_orient_from_fasta(bedfile, ref_genome_filepath='/project/fudenber_735/genomes/mm10/mm10.fa',
-                          flanking_bp=15, core_bp=18):
+                          ctcfpfm = 'data/MA0139.1.pfm', flanking_bp=15, core_bp=18):
     peaks_table = pd.read_table(bedfile, sep=',').iloc[:,:3]
     ref_genome = pysam.FastaFile(ref_genome_filepath)
 
 
-    ctcf_pfm = np.loadtxt('data/MA0139.1.pfm', skiprows=1)
+    ctcf_pfm = np.loadtxt(ctcfpfm, skiprows=1)
     ctcf_pwm = pfm_to_pwm(ctcf_pfm)
 
     ctcf_pfm_rc = np.flip(ctcf_pfm, axis=[0])
