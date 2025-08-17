@@ -76,48 +76,39 @@ def scan_sequence(pwm, pwm_rc, seq):
     else:
         return "-", rc_motif_position
 
-def fetch_and_orient_from_fasta(
-    bedfile,
-    ref_genome_filepath='/project/fudenber_735/genomes/mm10/mm10.fa',
-    ctcfpfm='data/MA0139.1.pfm',
-    flanking_bp=15, core_bp=19,
-    bed_is_end_inclusive=True   
-):
 
-    peaks_table = pd.read_csv(bedfile, sep=None, engine="python")
+
+def fetch_and_orient_from_fasta(bedfile, ref_genome_filepath='/project/fudenber_735/genomes/mm10/mm10.fa',
+                          ctcfpfm = 'data/MA0139.1.pfm', flanking_bp=15, core_bp=19):
+    peaks_table = pd.read_table(bedfile, sep=',').iloc[:,:3]
     ref_genome = pysam.FastaFile(ref_genome_filepath)
+
 
     ctcf_pfm = np.loadtxt(ctcfpfm, skiprows=1)
     ctcf_pwm = pfm_to_pwm(ctcf_pfm)
-    ctcf_pfm_rc = np.flip(np.flip(ctcf_pfm, axis=0), axis=1)
+
+    ctcf_pfm_rc = np.flip(ctcf_pfm, axis=[0])
+    ctcf_pfm_rc = np.flip(ctcf_pfm_rc, axis=[1])
     ctcf_pwm_rc = pfm_to_pwm(ctcf_pfm_rc)
 
     seqs = []
-    for _, row in peaks_table.iterrows():
-        chrom, start, end = row['chrom'], int(row['start']), int(row['end'])
-
-        # The first fetch to be end-exclusive if your BED is inclusive
-        end_excl = end + 1 if bed_is_end_inclusive else end
-
-        seq = dna_1hot(ref_genome.fetch(chrom, start, end_excl)).T
-
+    for idx, row in peaks_table.iterrows():
+        chrom, start, end = row[['chrom', 'start', 'end']]
+        seq = dna_1hot(ref_genome.fetch(chrom, int(start), int(end)+1)) # add one if it is inclusive sequence
+        seq = seq.T
         direction, ctcf_start = scan_sequence(ctcf_pwm, ctcf_pwm_rc, seq)
-
-        left  = max(0, start + ctcf_start - flanking_bp)
-        right = left + (2*flanking_bp + core_bp)
-        seq = dna_1hot(ref_genome.fetch(chrom, left, right)).T
+        seq = dna_1hot(ref_genome.fetch(chrom, int(start + ctcf_start - flanking_bp), int(start + ctcf_start + flanking_bp + core_bp)))
+        seq = seq.T
 
         if direction == "-":
-            seq = np.flip(seq, axis=0)  # A,C,G,T -> T,G,C,A
-            seq = np.flip(seq, axis=1)  # reverse positions
-
+                seq = np.flip(seq, axis=[0])
+                seq = np.flip(seq, axis=[1])
         seqs.append(seq)
 
-    seqs = np.array(seqs, dtype=object)
+    seqs = np.array(seqs)
     seq_len = 2*flanking_bp + core_bp
+
     return seqs, seq_len
-
-
 
 def predict_ctcf_occupancy(ctcf_bed, model_weights_path='data/model_weights'):
     seqs, seq_len = fetch_and_orient_from_fasta(ctcf_bed)
