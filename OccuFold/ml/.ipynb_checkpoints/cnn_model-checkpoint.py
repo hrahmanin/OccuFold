@@ -3,7 +3,7 @@ import torch.nn as nn
 torch.manual_seed(2024)
 
 class FlankCoreModel(nn.Module):
-    def __init__(self, seq_len, n_head, kernel_size, n_feature=4, out_features=2):
+    def __init__(self, seq_len, n_head, kernel_size, n_feature=4, out_features=3):
         super().__init__()
 
         d_embed1 = 5
