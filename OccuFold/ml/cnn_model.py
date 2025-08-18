@@ -36,7 +36,7 @@ class FlankCoreModel(nn.Module):
 
         self.flatten = nn.Flatten()
         flatten_out_features = self._calculate_num_out_features(n_feature, seq_len)
-        self.linear = nn.Linear(in_features=flatten_out_features, out_features=3)
+        self.linear = nn.Linear(in_features=flatten_out_features, out_features=2)
 
     def _calculate_num_out_features(self, n_feature, seq_len):
         with torch.no_grad():  
