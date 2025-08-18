@@ -3,7 +3,7 @@ import torch.nn as nn
 torch.manual_seed(2024)
 
 class FlankCoreModel(nn.Module):
-    def __init__(self, seq_len, n_head, kernel_size, n_feature=4):
+    def __init__(self, seq_len, n_head, kernel_size, n_feature=4, out_features=2):
         super().__init__()
 
         d_embed1 = 5
@@ -36,7 +36,7 @@ class FlankCoreModel(nn.Module):
 
         self.flatten = nn.Flatten()
         flatten_out_features = self._calculate_num_out_features(n_feature, seq_len)
-        self.linear = nn.Linear(in_features=flatten_out_features, out_features=2)
+        self.linear = nn.Linear(in_features=flatten_out_features, out_features=output_features)
 
     def _calculate_num_out_features(self, n_feature, seq_len):
         with torch.no_grad():  
