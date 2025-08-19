@@ -173,7 +173,7 @@ def train_ctcf_model(
     val_loader = DataLoader(val_set, batch_size=batch_size)
 
     # ---- Model ----
-    model = FlankCoreModel(seq_len=seq_len, n_head=11, kernel_size=3, out_features=num_classes).to(device)
+    model = CtcfOccupPredictor(seq_len=seq_len, n_head=11, kernel_size=3, out_features=num_classes).to(device)
 
     # ---- Optimizer & Loss ----
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
