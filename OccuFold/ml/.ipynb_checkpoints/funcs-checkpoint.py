@@ -3,7 +3,10 @@ import pysam
 import numpy as np
 from .cnn_model import FlankCoreModel as CtcfOccupPredictor
 import torch
+from torch.utils.data import Dataset, DataLoader, random_split
+import torch.nn as nn
 import torch.nn.functional as F
+import os
 torch.manual_seed(2024)
 device = 'cpu' # prediction is fast, so GPU is not necessary
 
@@ -128,3 +131,101 @@ def predict_ctcf_occupancy(ctcf_bed, ctcfpfm = 'data/MA0139.1.pfm',model_weights
     peaks_table.to_csv(f'{ctcf_bed}_with_predicted_occupancy', sep=',', index=False)
     
     return peaks_table
+
+
+class CTCFOccupancyDataset(Dataset):
+    def __init__(self, bedfile, label_cols=['Accessible', 'Bound']):#, 'Nucleosome.occupied']):
+        self.df = pd.read_csv(bedfile)#, sep="\t")
+        self.df = self.df[self.df[label_cols].notnull().all(axis=1)]
+        self.labels = self.df[label_cols].values.astype("float32")
+        self.seqs, self.seq_len = fetch_and_orient_from_fasta(bedfile, ctcfpfm = 'files/MA0139.1.pfm')  # returns shape (N, 4, L)
+
+    def __len__(self):
+        return len(self.seqs)
+
+    def __getitem__(self, idx):
+        x = torch.tensor(self.seqs[idx], dtype=torch.float32)
+        y = torch.tensor(self.labels[idx], dtype=torch.float32)
+        return x, y
+
+def train_ctcf_model(
+    bedfile_path='files/sites_with_freqs_and_seqs.csv',
+    save_weights_path='files/flankcore_trained_weights.pt',
+    batch_size=32,
+    epochs=20,
+    lr=1e-3,
+    device=None,
+    use_kldiv=False
+):
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    # ---- Load dataset ----
+    dataset = CTCFOccupancyDataset(bedfile_path)
+    num_classes = dataset[0][1].shape[0]
+    seq_len = dataset.seq_len
+
+    # ---- Split into train/val sets ----
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_set, val_set = random_split(dataset, [train_size, val_size])
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=batch_size)
+
+    # ---- Model ----
+    model = FlankCoreModel(seq_len=seq_len, n_head=11, kernel_size=3, out_features=num_classes).to(device)
+
+    # ---- Optimizer & Loss ----
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    if use_kldiv:
+        loss_fn = nn.KLDivLoss(reduction='batchmean')
+    else:
+        loss_fn = nn.CrossEntropyLoss()
+
+    # ---- Training Loop ----
+    for epoch in range(epochs):
+        model.train()
+        total_train_loss = 0
+        for x, y in train_loader:
+            x, y = x.to(device), y.to(device)
+            optimizer.zero_grad()
+            logits = model(x)
+
+            if use_kldiv:
+                log_probs = F.log_softmax(logits, dim=1)
+                loss = loss_fn(log_probs, y)
+            else:
+                targets = torch.argmax(y, dim=1)
+                loss = loss_fn(logits, targets)
+
+            loss.backward()
+            optimizer.step()
+            total_train_loss += loss.item()
+
+        # ---- Validation ----
+        model.eval()
+        total_val_loss = 0
+        with torch.no_grad():
+            for x, y in val_loader:
+                x, y = x.to(device), y.to(device)
+                logits = model(x)
+
+                if use_kldiv:
+                    log_probs = F.log_softmax(logits, dim=1)
+                    loss = loss_fn(log_probs, y)
+                else:
+                    targets = torch.argmax(y, dim=1)
+                    loss = loss_fn(logits, targets)
+
+                total_val_loss += loss.item()
+
+        print(f"Epoch {epoch+1}/{epochs} | Train Loss: {total_train_loss/len(train_loader):.4f} | Val Loss: {total_val_loss/len(val_loader):.4f}")
+
+    # ---- Save Weights ----
+    os.makedirs(os.path.dirname(save_weights_path), exist_ok=True)
+    torch.save(model.state_dict(), save_weights_path)
+    print(f"✅ Model weights saved at {save_weights_path}")
+
+    return model
+
+
