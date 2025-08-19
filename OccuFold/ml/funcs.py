@@ -134,7 +134,7 @@ def predict_ctcf_occupancy(ctcf_bed, ctcfpfm = 'data/MA0139.1.pfm',model_weights
 
 
 class CTCFOccupancyDataset(Dataset):
-    def __init__(self, bedfile, label_cols=['Accessible', 'Bound']):#, 'Nucleosome.occupied']):
+    def __init__(self, bedfile, label_cols=['Accessible', 'Bound', 'Nucleosome.occupied']):
         self.df = pd.read_csv(bedfile)#, sep="\t")
         self.df = self.df[self.df[label_cols].notnull().all(axis=1)]
         self.labels = self.df[label_cols].values.astype("float32")
