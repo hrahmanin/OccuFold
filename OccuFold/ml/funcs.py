@@ -134,11 +134,11 @@ def predict_ctcf_occupancy(ctcf_bed, ctcfpfm = 'data/MA0139.1.pfm',model_weights
 
 
 class CTCFOccupancyDataset(Dataset):
-    def __init__(self, bedfile, label_cols=['Accessible', 'Bound', 'Nucleosome.occupied']):
+    def __init__(self, bedfile, label_cols=['Accessible', 'Bound', 'Nucleosome.occupied'],ctcfpfm='files/MA0139.1.pfm'):
         self.df = pd.read_csv(bedfile)#, sep="\t")
         self.df = self.df[self.df[label_cols].notnull().all(axis=1)]
         self.labels = self.df[label_cols].values.astype("float32")
-        self.seqs, self.seq_len = fetch_and_orient_from_fasta(bedfile, ctcfpfm = 'files/MA0139.1.pfm')  # returns shape (N, 4, L)
+        self.seqs, self.seq_len = fetch_and_orient_from_fasta(bedfile, ctcfpfm = ctcfpfm)  # returns shape (N, 4, L)
 
     def __len__(self):
         return len(self.seqs)
@@ -150,6 +150,7 @@ class CTCFOccupancyDataset(Dataset):
 
 def train_ctcf_model(
     bedfile_path='files/sites_with_freqs_and_seqs.csv',
+    ctcfpfm = 'files/MA0139.1.pfm',
     save_weights_path='files/flankcore_trained_weights.pt',
     batch_size=32,
     epochs=20,
@@ -161,7 +162,7 @@ def train_ctcf_model(
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # ---- Load dataset ----
-    dataset = CTCFOccupancyDataset(bedfile_path)
+    dataset = CTCFOccupancyDataset(bedfile_path,ctcfpfm = ctcfpfm)
     num_classes = dataset[0][1].shape[0]
     seq_len = dataset.seq_len
 
