@@ -1,12 +1,43 @@
 Bootstrap: docker
 From: python:3.11-slim
 
+%files
+  . /opt/occufold_src
+
 %post
+  set -eux
   apt-get update && apt-get install -y --no-install-recommends \
-      build-essential gcc && \
+      build-essential git ca-certificates procps && \
       rm -rf /var/lib/apt/lists/*
-  pip install --no-cache-dir pandas cooler
+
+  python -m pip install --upgrade pip
+
+  # pick the right requirements file, fall back to explicit list
+  REQ=/opt/occufold_src/requirements.txt
+  [ -f "$REQ" ] || REQ=/opt/occufold_src/OccuFold/requirements.txt || true
+
+  if [ -f "$REQ" ]; then
+    python -m pip install --no-cache-dir --prefix=/usr/local -r "$REQ"
+  else
+    python -m pip install --no-cache-dir --prefix=/usr/local \
+      "numpy>=1.26" "pandas>=2.0" "bioframe>=0.4" "cooler>=0.9"
+  fi
+
+
+  # sanity-check the installs at build time
+  python - <<'PY'
+import numpy, pandas, importlib
+print("NUMPY_OK", numpy.__version__)
+print("PANDAS_OK", pandas.__version__)
+PY
+
+  # make sure expected bind points exist (quiet Singularity warnings)
+  mkdir -p /tmp /var/tmp /proc /etc
+  : > /etc/passwd; : > /etc/group; : > /etc/hosts; : > /etc/resolv.conf
 
 %environment
-  export PYTHONUNBUFFERED=1
+  export PYTHONPATH=/opt/occufold_src
+  export PATH=/opt/occufold_src/scripts:$PATH
 
+%runscript
+  exec "$@"
