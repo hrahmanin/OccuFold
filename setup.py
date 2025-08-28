@@ -22,10 +22,10 @@ def get_requirements(path):
         if req != "" and not (req.startswith("#") or req.startswith("-"))
     ]
 
-install_requires = get_requirements("requirements.txt")
+install_requires = get_requirements("requirementsinstall.txt")
 
 setup(
-    name="OccupancyInputCTCF",
+    name="OccupFold",
     version=VERSION,
     description=DESCRIPTION,
     url="https://github.com/OccuFold",
