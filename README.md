@@ -42,6 +42,27 @@ This notebook processes CTCF binding data from single-molecule footprinting (SMF
    Write final annotated data to `sites_with_freqs_and_seqs.tsv`.
 
 ---
+### Requirements
+
+- Nextflow ≥ 24.10
+
+- Java 11+ (for Nextflow)
+
+- Singularity/Apptainer (tested with Singularity 3.8.x)
+
+- Internet access during container build (to install Python packages)
+
+- Access to required data files:
+
+- Reference genome FASTA (e.g., mm10.fa) and index in a readable location
+
+- CTCF peaks BED/CSV/TSV (first 3 columns = chrom,start,end)
+
+- Model weights file (see workflow/files/model_weights)
+
+- CTCF PFM file (e.g., workflow/files/MA0139.1.pfm or .smooth.pfm)
+
+- The Nextflow singularity profile binds this repo and /project into the container, so relative paths like workflow/files/... work if you run from the repo root.
 
 ## 📁 Output
 
