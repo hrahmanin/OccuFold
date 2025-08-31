@@ -13,7 +13,44 @@ The structure of this repository follows as below:
 - processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
 <!--#### 🧬 CTCF Binding Site Processing Pipeline-->
 
-#### 🔄 Pipeline Overview
+### Requirements
+
+- Nextflow ≥ 24.10
+
+- Java 11+ (for Nextflow)
+
+- Singularity/Apptainer (tested with Singularity 3.8.x)
+
+
+Required files:
+
+- Reference genome FASTA (e.g., mm10.fa) and index in a readable location
+
+- CTCF peaks BED/CSV/TSV (first 3 columns = chrom,start,end)
+
+- Model weights file (see workflow/files/model_weights)
+
+- CTCF PFM file (e.g., workflow/files/MA0139.1.pfm or .smooth.pfm)
+
+### Install & Run (quick start)
+
+1. Clone the repo
+`git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
+cd OccupancyInputCTCF`
+
+2. Build the Singularity/Apptainer image
+(use --remote if you don't have local root privileges)
+`singularity build --remote occufold.sif singularity.def`
+
+3. Run the pipeline (predicted occupancy mode)
+note: Replace /path/to/CTCF_peaks.bed with your own peaks file.
+If you don't have peaks, you can DROP the --peaks line.
+`nextflow run main.nf -profile singularity \
+  --region "chr1:10_000_000-11_500_590" \
+  --peaks /path/to/CTCF_peaks.bed \
+  --outdir results -resume`  
+
+<!--#### 🔄 Pipeline Overview
 
 1. **Load Data**  
    Load CTCF binding site coordinates and binding frequency table.
@@ -38,28 +75,10 @@ The structure of this repository follows as below:
    Plot one-hot encoded sequences as grayscale "pixel" images for inspection.
 
 8. **Save Outputs**  
-   Write final annotated data to `sites_with_freqs_and_seqs.tsv`.
+   Write final annotated data to `sites_with_freqs_and_seqs.tsv`.-->
 
 ---
-### Requirements
 
-- Nextflow ≥ 24.10
-
-- Java 11+ (for Nextflow)
-
-- Singularity/Apptainer (tested with Singularity 3.8.x)
-
-- Internet access during container build (to install Python packages)
-
-Required files:
-
-- Reference genome FASTA (e.g., mm10.fa) and index in a readable location
-
-- CTCF peaks BED/CSV/TSV (first 3 columns = chrom,start,end)
-
-- Model weights file (see workflow/files/model_weights)
-
-- CTCF PFM file (e.g., workflow/files/MA0139.1.pfm or .smooth.pfm)
 
 
 #### 📁 Output
@@ -82,24 +101,16 @@ Required files:
 - *OpenMM*: A library for molecular simulations. (https://github.com/openmm/openmm)
 - *Open2C* analysis packages (see https://github.com/open2c)-->
 
-  
-#### Installation
-First, 
 
-```
-git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
-```
-
-### Workflow
-#### Running simulations 
-1. One-Dimensional Lattice Simulation: with running `workflow.py`
 
 
 #### Processing simulation data
-After running the simulations, the simulated trajectories can be processed to generate *in silico* ChIP-seq profiles, 1d contact maps, and 3d contact maps (optional). Scripts for data processing available in `processing`. Instructions are provided with the relevant python code.
+After running the workflow, the simulated trajectories can be processed to generate *in silico* ChIP-seq profiles, 1d contact maps, and 3d contact maps (optional). Scripts for data processing available in `processing`. Instructions are provided with the relevant python code.
 
-#### Analysis
-Once the data is processed, observable features can be quantified
+
+
+
+
 
 
 
