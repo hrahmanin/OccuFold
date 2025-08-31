@@ -3,21 +3,21 @@
 
 
 ### Description
-This repository contains a reproducible Nextflow (DSL2) pipeline that uses a neural-network model to predict CTCF occupancy from SMF/motif data and then prepares the inputs for loop-extrusion simulations to validate those predictions. It keeps key region fields, writes an occupancy track, and produces barrier lists plus a paramdict for simulations. The whole pipeline runs in a Singularity/Apptainer container for consistent, portable results.
+This repository contains a reproducible Nextflow (DSL2) pipeline that uses a neural-network model to predict CTCF occupancy (Convolutional Neural Network) from SMF/motif data and then prepares the inputs for loop-extrusion simulations to validate those predictions. It keeps key region fields, writes an occupancy track, and produces barrier lists plus a paramdict for simulations. The whole pipeline runs in a Singularity/Apptainer container for consistent, portable results.
 
 ![Workflow Figure](figures/workflowfigurenew.png)
 
 
-#### Structure of the repository
+<!--### Structure of the repository
 The structure of this repository follows as below:
 - processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
-<!--#### 🧬 CTCF Binding Site Processing Pipeline-->
+#### 🧬 CTCF Binding Site Processing Pipeline-->
 
 ### Requirements
 
 - Nextflow ≥ 24.10
 
-- Java 11+ (for Nextflow)
+<!-- - Java 11+ (for Nextflow)-->
 
 - Singularity/Apptainer (tested with Singularity 3.8.x)
 
@@ -78,34 +78,31 @@ If you don't have peaks, you can DROP the --peaks line.
    Write final annotated data to `sites_with_freqs_and_seqs.tsv`.-->
 
 ---
+**Outputs**
+- **Step 1:** `results/step1/REGION.csv` — region table (e.g., `chrom,start,end,mid,strand,...`).
+- **Step 2:** `results/step2/REGION.occupancy.csv` — Step-1 columns **plus** model outputs (e.g., `Accessible,Bound,Nucleosome.occupied`).
+- **Step 3:** `results/step3/REGION.occupancy.refined_occupancy.csv`, `...barriers.csv`, `...ctcf_lists.csv`, `...paramdict.json`.
+- **Step 4:** `results/step3/Chip.png, Hi-C.png`
 
 
-
-#### 📁 Output
+<!--#### 📁 Output
 
 - `sites_with_freqs_and_seqs.tsv` – Final annotated file including:
   - `chrom`, `start`, `end`, `TFBS_cluster`
   - Frequency columns: `Bound`, `Accessible`, `Nucleosome.occupied`
-  - DNA `sequence`
+  - DNA `sequence`-->
 
 
-- models/: Code for deep learning models (CNN architectures, training scripts, evaluation functions) used to predict CTCF occupancy or 3D contacts
+<!-- - models/: Code for deep learning models (CNN architectures, training scripts, evaluation functions) used to predict CTCF occupancy or 3D contacts
 - analysis/: Notebooks or scripts for analyzing results (e.g. comparing predicted vs. actual Hi-C, generating figures).
 - utils/: Utility functions and tools (shared helper code for data I/O, metric calculations, etc.).
-- outputs/: Folder to store output files, such as processed data or model predictions (keeping them separate from code)
-
-  
-
-<!--### Requirements
-- *Polychrom*: A toolkit for polymer simulations. (https://github.com/open2c/polychrom)
-- *OpenMM*: A library for molecular simulations. (https://github.com/openmm/openmm)
-- *Open2C* analysis packages (see https://github.com/open2c)-->
+- outputs/: Folder to store output files, such as processed data or model predictions (keeping them separate from code)-->
 
 
 
 
-#### Processing simulation data
-After running the workflow, the simulated trajectories can be processed to generate *in silico* ChIP-seq profiles, 1d contact maps, and 3d contact maps (optional). Scripts for data processing available in `processing`. Instructions are provided with the relevant python code.
+<!-- #### Processing simulation data
+After running the workflow, the simulated trajectories can be processed to generate *in silico* ChIP-seq profiles, 1d contact maps, and 3d contact maps (optional). Scripts for data processing available in `processing`. Instructions are provided with the relevant python code.-->
 
 
 
