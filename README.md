@@ -1,20 +1,20 @@
-# OccupancyInputCTCF
+# 🧬 OccuFold
 
 
 
 ### Description
-This GitHub repository provides tools for training machine learning models to predict 3D chromatin architecture from single-molecule footprinting data (e.g., methylation patterns). It integrates sequence features and occupancy profiles to infer genome folding and validates predictions by comparing Hi-C data with simulated chromatin loop extrusion, incorporating locus-specific occupancy rates and dynamic CTCF barriers.
+This repository contains a reproducible Nextflow (DSL2) pipeline that uses a neural-network model to predict CTCF occupancy from SMF/motif data and then prepares the inputs for loop-extrusion simulations to validate those predictions. It keeps key region fields, writes an occupancy track, and produces barrier lists plus a paramdict for simulations. The whole pipeline runs in a Singularity/Apptainer container for consistent, portable results.
 
 ![Workflow Figure](figures/workflowfigurenew.png)
 
-### Structure of the repository
+#### Structure of the repository
 The structure of this repository follows as below:
 - processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
-  # 🧬 CTCF Binding Site Processing Pipeline
+#### 🧬 CTCF Binding Site Processing Pipeline
 
 This notebook processes CTCF binding data from single-molecule footprinting (SMF) and ChIP-seq into one-hot encoded DNA sequences for use in machine learning models.
 
-## 🔄 Pipeline Overview
+#### 🔄 Pipeline Overview
 
 1. **Load Data**  
    Load CTCF binding site coordinates and binding frequency table.
@@ -64,7 +64,7 @@ This notebook processes CTCF binding data from single-molecule footprinting (SMF
 
 - The Nextflow singularity profile binds this repo and /project into the container, so relative paths like workflow/files/... work if you run from the repo root.
 
-## 📁 Output
+#### 📁 Output
 
 - `sites_with_freqs_and_seqs.tsv` – Final annotated file including:
   - `chrom`, `start`, `end`, `TFBS_cluster`
@@ -85,7 +85,7 @@ This notebook processes CTCF binding data from single-molecule footprinting (SMF
 - *Open2C* analysis packages (see https://github.com/open2c)-->
 
   
-## Installation
+#### Installation
 First, 
 
 ```
