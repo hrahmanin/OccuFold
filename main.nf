@@ -13,7 +13,9 @@ params.use_predicted_occupancy = params.use_predicted_occupancy ?: true
 workflow {
   PREPROCESS( Channel.value(params.region) )
   PREDICT( PREPROCESS.out )
+  BARRIERS ( PREDICT.out )
 }
+
 
 process PREPROCESS {
   def safe = ((params.region as String).replaceAll('[_,]','')).replaceAll(/[^A-Za-z0-9._-]/,'_')
@@ -50,6 +52,8 @@ process PREPROCESS {
   mv step1/*.csv "${safe}.csv"
   """
 }
+
+
 
 process PREDICT {
   publishDir "${params.outdir}/step2", mode: 'copy'
@@ -89,3 +93,54 @@ process PREDICT {
   mv step2/*.occupancy.csv "${stem}.occupancy.csv"
   """
 }
+
+
+
+
+process BARRIERS {
+  publishDir "${params.outdir}/step3", mode: 'copy'
+
+  input:
+  // val region
+  path occ_csv
+
+  output:
+  path "${file(occ_csv).baseName}.refined_occupancy.csv"
+  path "${file(occ_csv).baseName}.barriers.csv"
+  path "${file(occ_csv).baseName}.ctcf_lists.csv"
+  path "${file(occ_csv).baseName}.paramdict.json"
+
+  script:
+  def stem  = file(occ_csv).baseName
+  def pdOpt = params.paramdict ? "--paramdict ${params.paramdict}" : ""
+
+  """
+  mkdir -p .mplconfig
+  export MPLCONFIGDIR="\$PWD/.mplconfig"
+
+  REGION_CANON="\$(echo "${params.region}" | tr -d '_,')"
+
+  python ${projectDir}/scripts/step3_barriers_lattice.py \
+    --input ${occ_csv} \
+    --region "\${REGION_CANON}" \
+    --outdir step3 \
+    --lattice-site ${params.lattice_site} \
+    ${pdOpt}
+
+  mv step3/*.refined_occupancy.csv "${stem}.refined_occupancy.csv"
+  mv step3/*.barriers.csv           "${stem}.barriers.csv"
+  mv step3/*.ctcf_lists.csv         "${stem}.ctcf_lists.csv"
+  mv step3/*.paramdict.json         "${stem}.paramdict.json"
+  """
+
+}
+
+
+
+
+
+
+
+
+
+
