@@ -7,12 +7,11 @@ This repository contains a reproducible Nextflow (DSL2) pipeline that uses a neu
 
 ![Workflow Figure](figures/workflowfigurenew.png)
 
+
 #### Structure of the repository
 The structure of this repository follows as below:
 - processing/: Scripts and pipelines for NGS data processing (e.g., handling SMF methylation footprint data and ChIP-seq data).
-#### 🧬 CTCF Binding Site Processing Pipeline
-
-This notebook processes CTCF binding data from single-molecule footprinting (SMF) and ChIP-seq into one-hot encoded DNA sequences for use in machine learning models.
+<!--#### 🧬 CTCF Binding Site Processing Pipeline-->
 
 #### 🔄 Pipeline Overview
 
@@ -52,7 +51,7 @@ This notebook processes CTCF binding data from single-molecule footprinting (SMF
 
 - Internet access during container build (to install Python packages)
 
-- Access to required data files:
+Required files:
 
 - Reference genome FASTA (e.g., mm10.fa) and index in a readable location
 
@@ -62,7 +61,6 @@ This notebook processes CTCF binding data from single-molecule footprinting (SMF
 
 - CTCF PFM file (e.g., workflow/files/MA0139.1.pfm or .smooth.pfm)
 
-- The Nextflow singularity profile binds this repo and /project into the container, so relative paths like workflow/files/... work if you run from the repo root.
 
 #### 📁 Output
 
