@@ -35,14 +35,17 @@ Required files:
 ### Install & Run (quick start)
 
 1. Clone the repo
-`git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
-cd OccupancyInputCTCF`
+<!--`git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
+cd OccupancyInputCTCF`-->
 
-2. Build the Singularity/Apptainer image
+`git clone https://github.com/hrahmanin/OccuFold.git
+cd OccuFold`
+
+3. Build the Singularity/Apptainer image
 (use --remote if you don't have local root privileges)
 `singularity build --remote occufold.sif singularity.def`
 
-3. Run the pipeline (predicted occupancy mode)
+4. Run the pipeline (predicted occupancy mode)
 note: Replace /path/to/CTCF_peaks.bed with your own peaks file.
 If you don't have peaks, you can DROP the --peaks line.
 `nextflow run main.nf -profile singularity \
