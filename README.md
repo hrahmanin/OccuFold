@@ -84,9 +84,9 @@ If you don't have peaks, you can DROP the --peaks line.
 **Outputs**
 - **Step 1:** `results/step1/REGION.csv` — region table (e.g., `chrom,start,end,mid,strand,...`).
 - **Step 2:** `results/step2/REGION.occupancy.csv` — Step-1 columns **plus** model outputs (e.g., `Accessible,Bound,Nucleosome.occupied`).
-- **Step 3:** `results/step3/REGION.occupancy.refined_occupancy.csv`, `...barriers.csv`, `...ctcf_lists.csv`, `...paramdict.json`.
-- **Step 4:** `results/step3/Chip.png, Hi-C.png`
-
+- **Step 3:** `results/step3/REGION.occupancy.refined_occupancy.csv`, `barriers.csv`, `ctcf_lists.csv`, `paramdict.json`.
+- **Step 4:** `results/step4/REGION.1d_sims`
+- **Step 5:** `results/step5/Chip.png, Hi-C.png`
 
 <!--#### 📁 Output
 
