@@ -35,11 +35,11 @@ Required files:
 ### Install & Run (quick start)
 
 1. Clone the repo
-<!--`git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
-cd OccupancyInputCTCF`-->
+`git clone https://github.com/Fudenberg-Research-Group/OccupancyInputCTCF.git
+cd OccupancyInputCTCF`
 
-`git clone https://github.com/hrahmanin/OccuFold.git
-cd OccuFold`
+<!--`git clone https://github.com/hrahmanin/OccuFold.git
+cd OccuFold`-->
 
 3. Build the Singularity/Apptainer image
 (use --remote if you don't have local root privileges)
