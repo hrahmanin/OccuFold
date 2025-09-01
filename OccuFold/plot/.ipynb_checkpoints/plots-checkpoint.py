@@ -4,9 +4,9 @@ from matplotlib.colors import LogNorm
 import bioframe
 import cooler
 import pyBigWig
-import OccupancyInputCTCF.utils.experimental_path as exp
+import OccuFold.utils.experimental_path as exp
 import cooltools
-from cooltools.lib.plotting import *
+#from cooltools.lib.plotting import *
 
 
 ### importing Hi-C maps 
@@ -66,7 +66,8 @@ def plot_chip_hic(region, chip, chip_ctcf, binned_matrix, clr=clr, lattice_size 
     im = ax.matshow(
         clr.matrix().fetch(region),
         norm=norm,
-        cmap='fall'
+        cmap='Oranges'
+        #cmap='fall'
     )
     ax.set_title(f'{chrom}:{start_reg:,}-{end_reg:,}')
     ax.xaxis.set_visible(False)
@@ -93,7 +94,7 @@ def plot_chip_hic(region, chip, chip_ctcf, binned_matrix, clr=clr, lattice_size 
 
     # Simulated Hi-C map
     ax = axs[0, 2]
-    im = ax.matshow(np.log10(binned_matrix),  cmap='fall')
+    im = ax.matshow(np.log10(binned_matrix), cmap='Oranges')#  cmap='fall')
     ax.set_title('1D Simulation, %s'%region_[0])
     cax = axs[0, 3]
     plt.colorbar(im, cax=cax, label='raw counts')

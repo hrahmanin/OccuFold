@@ -13,8 +13,14 @@ params.use_predicted_occupancy = params.use_predicted_occupancy ?: true
 workflow {
   PREPROCESS( Channel.value(params.region) )
   PREDICT( PREPROCESS.out )
-  BARRIERS ( PREDICT.out )
+
+  def (ch_refined, ch_barriers, ch_lists, ch_param) = BARRIERS( PREDICT.out )
+  def (ch_sims, ch_pdcopy) = SIM1D( ch_refined, ch_barriers, ch_lists, ch_param )
+    
+  PLOTMAPS( ch_sims, ch_pdcopy )
 }
+
+
 
 
 process PREPROCESS {
@@ -132,8 +138,85 @@ process BARRIERS {
   mv step3/*.ctcf_lists.csv         "${stem}.ctcf_lists.csv"
   mv step3/*.paramdict.json         "${stem}.paramdict.json"
   """
-
 }
+
+
+
+process SIM1D {
+  publishDir "${params.outdir}/step4", mode: 'copy'
+
+  input:
+  path refined_csv
+  path barriers_csv
+  path ctcf_lists_csv
+  path paramdict_json
+
+  output:
+  // emit both the sims folder and a copied paramdict for step 5
+  path "*.1d_sims"   //for 1d outputs
+  path "*.paramdict.json"
+
+  script:
+  def tag = file(refined_csv).baseName.replace('.occupancy.refined_occupancy','')
+  """
+  mkdir -p .mplconfig
+  export MPLCONFIGDIR="\$PWD/.mplconfig"
+
+  REGION_CANON="\$(echo "${params.region}" | tr -d '_,')"
+
+  python ${projectDir}/scripts/step4_perform_1Dsimulation.py \
+    --refined ${refined_csv} \
+    --paramdict ${paramdict_json} \
+    --region "\${REGION_CANON}" \
+    --outdir step4 \
+    --n-sim ${params.n_simulations} \
+    --traj-len ${params.trajectory_length} \
+    --lattice-site ${params.lattice_site} \
+    --nprocs ${task.cpus}
+
+  # copy paramdict alongside sims with the same tag
+  cp ${paramdict_json} step4/${tag}.paramdict.json
+
+  mv step4/${tag}.1d_sims "${tag}.1d_sims"
+  mv step4/${tag}.paramdict.json "${tag}.paramdict.json"
+  """
+}
+
+process PLOTMAPS {
+  publishDir "${params.outdir}/step5", mode: 'copy'
+
+  input:
+  path simdir          // from SIM1D: *.1d_sims
+  path paramdict_json  // from SIM1D: *.paramdict.json
+
+  output:
+  path "*.plots.pdf"
+  path "*.contact_map.npy"
+  path "*.chip.npy"
+  path "*.chip_ctcf.npy"
+
+  script:
+  def tag = file(paramdict_json).baseName.replace('.paramdict','')
+  """
+  mkdir -p .mplconfig
+  export MPLCONFIGDIR="\$PWD/.mplconfig"
+
+  REGION_CANON="\$(echo "${params.region}" | tr -d '_,')"
+
+  python ${projectDir}/scripts/step5_process_maps.py \
+    --simdir ${simdir} \
+    --paramdict ${paramdict_json} \
+    --region "\${REGION_CANON}" \
+    --outdir step5 \
+    --dimension ${params.map_dimension}
+
+  mv step5/${tag}.plots.pdf        "${tag}.plots.pdf"
+  mv step5/${tag}.contact_map.npy  "${tag}.contact_map.npy"
+  mv step5/${tag}.chip.npy         "${tag}.chip.npy"
+  mv step5/${tag}.chip_ctcf.npy    "${tag}.chip_ctcf.npy"
+  """
+}
+
 
 
 
